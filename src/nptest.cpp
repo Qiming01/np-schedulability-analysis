@@ -11,7 +11,7 @@
 
 #ifdef CONFIG_PARALLEL
 
-#include "tbb/task_scheduler_init.h"
+#include <oneapi/tbb/global_control.h>
 
 #endif
 
@@ -69,8 +69,13 @@ static Analysis_result analyze(
 	std::istream &aborts_in)
 {
 #ifdef CONFIG_PARALLEL
-	tbb::task_scheduler_init init(
-		num_worker_threads ? num_worker_threads : tbb::task_scheduler_init::automatic);
+	std::unique_ptr<tbb::global_control> tbb_controller;
+	if (num_worker_threads > 0) {
+		tbb_controller = std::make_unique<tbb::global_control>(
+			tbb::global_control::max_allowed_parallelism,
+			num_worker_threads
+		);
+	}
 #endif
 
 	// Parse input files and create NP scheduling problem description

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.20)
 
 project(NP_schedulabiliy_test)
 
@@ -22,8 +22,15 @@ if (COLLECT_SCHEDULE_GRAPHS)
     add_compile_definitions(CONFIG_COLLECT_SCHEDULE_GRAPH)
 endif()
 
-find_path(TBB_INCLUDE_DIR NAMES tbb/task_scheduler_init.h)
-find_library(TBB_LIB NAMES tbb)
+find_path(TBB_INCLUDE_DIR
+  NAMES oneapi/tbb/global_control.h
+  HINTS ${TBB_ROOT}/include
+)
+find_library(TBB_LIB
+  NAMES onetbb tbb
+  HINTS ${TBB_ROOT}/lib
+)
+
 
 if(USE_JE_MALLOC)
   find_library(ALLOC_LIB NAMES jemalloc)
